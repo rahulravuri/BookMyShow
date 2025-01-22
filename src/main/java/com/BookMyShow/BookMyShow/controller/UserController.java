@@ -25,7 +25,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/view")
+@RequestMapping
 public class UserController {
 
 	private final RegionService RegionService;
