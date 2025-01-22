@@ -1,12 +1,12 @@
 package com.BookMyShow.BookMyShow.controller;
 
 import com.BookMyShow.BookMyShow.DTO.BookdetailsDTO;
+import com.BookMyShow.BookMyShow.DTO.NewShowDTO;
+import com.BookMyShow.BookMyShow.Security.UserVerification;
+import com.BookMyShow.BookMyShow.services.BookingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,14 +15,24 @@ import java.util.Map;
 @RequestMapping("/Admin")
 public class AdminController {
 
-    @PostMapping
-    public ResponseEntity<Map<String, String>> BookTickets(@RequestBody BookdetailsDTO BookdetailsDTO) throws Exception {
-        Map<String, String> re = new HashMap<>();
-        try{
 
-            re.put("Booking Status", "Booked");
+    UserVerification userverification;
+
+    AdminController(UserVerification userverificatione){
+        this.userverification=userverification;
+    }
+
+    @PostMapping
+    public ResponseEntity<Map<String, String>> BookTickets(@RequestBody NewShowDTO NewShowDTO, @CookieValue(name = "Bearer", defaultValue = "") String token) throws Exception {
+        Map<String, String> re = new HashMap<>();
+        if(!userverification.userverification(token,"Admin")){
+            re.put("Status","InvalidUser");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(re);
+        }
+        try{
+            re.put("Status", "Shows Creation Process Started");
         } catch (Exception e) {
-            re.put("Booking Status", e.getMessage()); ;
+            re.put("Status", e.getMessage()); ;
         }
         return ResponseEntity.status(HttpStatus.OK).body(re);
     }
