@@ -30,10 +30,8 @@ public class MovieShow {
 	@ManyToOne
 	@JoinColumn(name="movieid")
 	private Movie movie;
-	
 	private LocalDateTime showTime;
-
-	private Integer showdate;
+	private LocalDateTime showendTime;
 	@OneToMany(mappedBy = "show")
 	private List<ShowSeats> seats;
 

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.BookMyShow.BookMyShow.services.ShowService;
 
 @RestController
 @RequestMapping("/Admin")
@@ -17,19 +18,20 @@ public class AdminController {
 
 
     UserVerification userverification;
+    ShowService ShowService;
 
-    AdminController(UserVerification userverificatione){
+    AdminController(UserVerification userverificatione,ShowService ShowService){
         this.userverification=userverification;
+        this.ShowService=ShowService;
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, String>> BookTickets(@RequestBody NewShowDTO NewShowDTO, @CookieValue(name = "Bearer", defaultValue = "") String token) throws Exception {
+    public ResponseEntity<Map<String, String>> BookTickets(@RequestBody NewShowDTO NewShowDTO, @RequestHeader("X-User-Id") String userId,
+                                                           @RequestHeader("X-User-Roles") String roles) throws Exception {
         Map<String, String> re = new HashMap<>();
-        if(!userverification.userverification(token,"Admin")){
-            re.put("Status","InvalidUser");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(re);
-        }
+
         try{
+            ShowService.createshows(NewShowDTO);
             re.put("Status", "Shows Creation Process Started");
         } catch (Exception e) {
             re.put("Status", e.getMessage()); ;

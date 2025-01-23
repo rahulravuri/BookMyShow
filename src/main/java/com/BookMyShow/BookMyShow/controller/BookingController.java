@@ -26,9 +26,10 @@ public class BookingController {
 	}
 	
 	@PostMapping("/book")
-	public ResponseEntity<Map<String, String>> BookTickets(@RequestBody BookdetailsDTO BookdetailsDTO,@CookieValue(name = "Bearer", defaultValue = "") String token) throws Exception {
+	public ResponseEntity<Map<String, String>> BookTickets(@RequestBody BookdetailsDTO BookdetailsDTO, @RequestHeader("X-User-Id") String userId,
+														   @RequestHeader("X-User-Roles") String roles) throws Exception {
 		Map<String, String> re = new HashMap<>();
-		if(!userverification.userverification(token,"User")){
+		if(roles!="user"){
 			re.put("Status","InvalidUser");
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(re);
 		}

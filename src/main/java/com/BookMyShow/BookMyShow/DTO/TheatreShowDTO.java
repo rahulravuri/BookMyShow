@@ -12,4 +12,5 @@ import java.time.LocalDateTime;
 public class TheatreShowDTO {
      private int ScreenId;
      private LocalDateTime showTime;
+    private LocalDateTime showendTime;
 }

@@ -22,6 +22,6 @@ public class User_View {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int userid ;
 	private String emailid;
-	private String phone_number;
+	private int phone_number;
 
 }
