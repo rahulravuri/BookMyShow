@@ -8,12 +8,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.BookMyShow.BookMyShow.DTO.NewShowDTO;
+import com.BookMyShow.BookMyShow.DTO.TheatreShowDTO;
 import com.BookMyShow.BookMyShow.models.Movie;
 import com.BookMyShow.BookMyShow.models.TheatreShowHandler;
 import com.BookMyShow.BookMyShow.models.TheatreShowStatus;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.BookMyShow.BookMyShow.DTO.showDTO;
@@ -30,7 +33,7 @@ public class ShowService {
 	private ShowRepository ShowRepository;
 
 	private TheatreShowHRepository TheatreShowHRepository;
-	private static final ObjectMapper objectMapper = (new ObjectMapper()).registerModule(new JavaTimeModule());
+	private static final ObjectMapper objectMapper = (new ObjectMapper()).registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
 
 	public  ShowService(ShowRepository ShowRepository,TheatreShowHRepository TheatreShowHRepository) {
@@ -67,15 +70,26 @@ public class ShowService {
 	}
 
 	public int createshows(NewShowDTO NewShowDTO){
-
-		JsonNode showsData = objectMapper.valueToTree(NewShowDTO);
+		List<TheatreShowDTO> data=NewShowDTO.getNewShows();
+		JsonNode showsData = objectMapper.valueToTree(data);
 		TheatreShowHandler show=new TheatreShowHandler();
+		show.setMovieid(NewShowDTO.getMovieId());
+		show.setTheatreId(NewShowDTO.getMovieId());
+		show.setInformation("Record Created");
 		show.setShowsData(showsData);
 		show.setCreationTime(LocalDateTime.now());
 		show.setTheatreShowStatus(TheatreShowStatus.Pending);
 		TheatreShowHRepository.save(show);
-		TheatreShowHRepository.Create_Show(show.getId());
+		TheatreShowHRepository.Create_Shows(show.getId());
 		return show.getId();
+
+	}
+
+	public void CancelShow(int showId) throws Exception {
+		if(!ShowRepository.existsById(showId)) {
+			throw new EntityNotFoundException("Show not found with id: " + showId);
+		}
+		ShowRepository.deleteById(showId);
 
 	}
 }

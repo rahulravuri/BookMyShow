@@ -79,16 +79,6 @@ public class UserController {
 
 	}
 
-	@GetMapping("/shows/movie1/{id}")
-	public ResponseEntity<Map<String, Object>> getAllMovieshowstest(
-			@PathVariable("id") int id) {
-		Map<String, Object> re = new HashMap<>();
-		Object data = ShowService.getallshows(id);
-		re.put("Movies List", data);
-		return ResponseEntity.status(HttpStatus.OK).body(re);
-
-	}
-
 	@GetMapping("/shows/theatre/{id}")
 	public ResponseEntity<Map<String, Object>> getAlltheatreshows(
 			@PathVariable("id") int id) {

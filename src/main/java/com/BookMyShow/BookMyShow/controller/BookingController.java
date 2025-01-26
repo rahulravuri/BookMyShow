@@ -44,11 +44,11 @@ public class BookingController {
 		return ResponseEntity.status(HttpStatus.OK).body(re);
 	}
 
-	@PostMapping("/clear")
+	@PostMapping("/Payment")
 	public ResponseEntity<Map<String, String>> CleatTickets(@RequestBody PaymentDTO PaymentDTO) throws Exception {
 		Map<String, String> re = new HashMap<>();
 		try{
-			BookingService.PaymentStatustickets(PaymentDTO);
+			BookingService.PaymentUpdate(PaymentDTO);
 			re.put("Status", "Cleared");
 		} catch (Exception e) {
 			re.put(" Status", e.getMessage()); ;

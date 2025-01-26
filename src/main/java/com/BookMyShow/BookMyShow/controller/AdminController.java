@@ -25,8 +25,8 @@ public class AdminController {
         this.ShowService=ShowService;
     }
 
-    @PostMapping
-    public ResponseEntity<Map<String, String>> BookTickets(@RequestBody NewShowDTO NewShowDTO, @RequestHeader("X-User-Id") String userId,
+    @PostMapping("/Add")
+    public ResponseEntity<Map<String, String>> CreateShows(@RequestBody NewShowDTO NewShowDTO, @RequestHeader("X-User-Id") String userId,
                                                            @RequestHeader("X-User-Roles") String roles) throws Exception {
         Map<String, String> re = new HashMap<>();
 
@@ -38,4 +38,21 @@ public class AdminController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(re);
     }
+
+    @PostMapping("/Delete")
+    public ResponseEntity<Map<String, String>> DeleteShow(@RequestBody int ShowId, @RequestHeader("X-User-Id") String userId,
+                                                           @RequestHeader("X-User-Roles") String roles) throws Exception {
+        Map<String, String> re = new HashMap<>();
+
+        try{
+            ShowService.CancelShow(ShowId);
+
+            re.put("Status", "Shows Deleted");
+        } catch (Exception e) {
+            re.put("Status", e.getMessage()); ;
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(re);
+    }
+
+
 }

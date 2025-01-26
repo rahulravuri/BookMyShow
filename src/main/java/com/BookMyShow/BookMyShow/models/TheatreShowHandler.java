@@ -15,12 +15,15 @@ public class TheatreShowHandler {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
+    private int Movieid;
+    private int TheatreId;
+    @Enumerated(EnumType.STRING)
     private TheatreShowStatus TheatreShowStatus;
     @Convert(converter = JsonShowConverter.class)
     @Column(name = "shows_data", columnDefinition = "json")
     private JsonNode showsData;
     private LocalDateTime CreationTime;
+    private String Information;
 
 
 }

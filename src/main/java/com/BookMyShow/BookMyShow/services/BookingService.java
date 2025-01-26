@@ -69,25 +69,29 @@ public class BookingService {
 		return "Completed";
 	}
 
-	public void PaymentStatustickets(PaymentDTO PaymentDTO) {
+	public void PaymentUpdate(PaymentDTO PaymentDTO) {
 		if(PaymentDTO.getBookingStatus()==BookingStatus.Booked){
-			finaltickets(PaymentDTO.getBookingId());
+			CompleteBooking(PaymentDTO.getBookingId());
 		}
-		else{ cleartickets(PaymentDTO.getBookingId());}
+		else{ CancelBooking(PaymentDTO.getBookingId());}
 	}
 
 
-
-	public void cleartickets(int bookingId) {
+	@Transactional(isolation=Isolation.SERIALIZABLE)
+	public void CancelBooking(int bookingId) {
 		Booking b=BookingRepository.findById(bookingId).orElseThrow();
 		for(ShowSeats i:b.getSeats()){
 			i.setSeatStatus(ShowSeatStatus.Empty);
 			i.setBooking(null);
 			ShowSeatsRepository.save(i);
 		}
+		b.setBookingStatus(BookingStatus.Cancelled);
+		BookingRepository.save(b);
+
     }
 
-	public void finaltickets(int bookingId) {
+	@Transactional(isolation=Isolation.SERIALIZABLE)
+	public void CompleteBooking(int bookingId) {
 		Booking b=BookingRepository.findById(bookingId).orElseThrow();
 		for(ShowSeats i:b.getSeats()){
 			i.setSeatStatus(ShowSeatStatus.Booked);
