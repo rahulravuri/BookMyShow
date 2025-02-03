@@ -9,36 +9,38 @@ import java.util.stream.Collectors;
 
 import com.BookMyShow.BookMyShow.DTO.NewShowDTO;
 import com.BookMyShow.BookMyShow.DTO.TheatreShowDTO;
-import com.BookMyShow.BookMyShow.models.Movie;
-import com.BookMyShow.BookMyShow.models.TheatreShowHandler;
-import com.BookMyShow.BookMyShow.models.TheatreShowStatus;
+import com.BookMyShow.BookMyShow.models.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.BookMyShow.BookMyShow.DTO.showDTO;
 import com.BookMyShow.BookMyShow.Mapper.MovieMapper;
 import com.BookMyShow.BookMyShow.Mapper.showMapper;
-import com.BookMyShow.BookMyShow.models.MovieShow;
 import com.BookMyShow.BookMyShow.repositories.ShowRepository;
 import com.BookMyShow.BookMyShow.repositories.TheatreShowHRepository;
+import com.BookMyShow.BookMyShow.repositories.ShowSeatsRepository;
 
 import static java.util.stream.Collectors.groupingBy;
 
 @Service
 public class ShowService {
 	private ShowRepository ShowRepository;
+	private ShowSeatsRepository ShowSeatsRepository;
 
 	private TheatreShowHRepository TheatreShowHRepository;
 	private static final ObjectMapper objectMapper = (new ObjectMapper()).registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
 
-	public  ShowService(ShowRepository ShowRepository,TheatreShowHRepository TheatreShowHRepository) {
+	public  ShowService(ShowRepository ShowRepository,TheatreShowHRepository TheatreShowHRepository,ShowSeatsRepository ShowSeatsRepository) {
 		this.TheatreShowHRepository=TheatreShowHRepository;
 		this.ShowRepository=ShowRepository;
+		this.ShowSeatsRepository=ShowSeatsRepository;
 	}
 
 	
@@ -69,6 +71,7 @@ public class ShowService {
 		//return null;
 	}
 
+	@Transactional
 	public int createshows(NewShowDTO NewShowDTO){
 		List<TheatreShowDTO> data=NewShowDTO.getNewShows();
 		JsonNode showsData = objectMapper.valueToTree(data);
@@ -92,4 +95,20 @@ public class ShowService {
 		ShowRepository.deleteById(showId);
 
 	}
+	@Transactional
+	@Scheduled(fixedRate = 60000)
+	public void unblockExpiredSeats() {
+		LocalDateTime expirationTime = LocalDateTime.now().minusMinutes(5);
+		List<ShowSeats> blockedSeats = ShowSeatsRepository.findExpiredBlockedSeats(expirationTime,ShowSeatStatus.InProgress);
+
+		for (ShowSeats seat : blockedSeats) {
+			seat.setSeatStatus(ShowSeatStatus.Empty);
+			seat.setBooking(null);
+		}
+
+		ShowSeatsRepository.saveAll(blockedSeats);
+	}
+
+
+
 }

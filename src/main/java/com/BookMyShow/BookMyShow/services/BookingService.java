@@ -101,4 +101,11 @@ public class BookingService {
 		BookingRepository.save(b);
 
 	}
+
+	public List<Booking> GetAllBookings(String email){
+		Optional<List<Booking>> data= BookingRepository.findByEmailId(email);
+
+		if(data.isPresent()) return data.get();
+		return null;
+	}
 }
